@@ -72,28 +72,28 @@ void IMU::gyro_calculate(){
 
 void IMU::sensorDataTransform() {
     for (uint8_t i = 0; i < 3; i++) {
-        gyro_sensor_[i] = (
+        gyro_sensor_[i] = gyro_sensor_[i]*(1-filter_k_) + (gyro_sen_ * (
             raw_data_.gyro[0] * R_imu_[i][0] +
             raw_data_.gyro[1] * R_imu_[i][1] +
             raw_data_.gyro[2] * R_imu_[i][2]
-        ) - gyro_bias_[i];
-        accel_sensor_[i] = accel_sen_ * (
+        ) - gyro_bias_[i])*(filter_k_);
+        accel_sensor_[i] = accel_sensor_[i]*(1-filter_k_) + (accel_sen_ * (
             raw_data_.accel[0] * R_imu_[i][0] +
             raw_data_.accel[1] * R_imu_[i][1] +
             raw_data_.accel[2] * R_imu_[i][2]
-        ) - accel_bias_[i];
+        ) - accel_bias_[i])*(filter_k_);
     }
 }
 
 void IMU::sensorRecord() {
-    if (sensor_record_cnt_ < 200) {
+    if (sensor_record_cnt_ < 500) {
         HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
         for (uint8_t i = 0; i < 3; i++) {
             accel_sensor_sum_[i] += minus_if_near(minus_if_near(accel_sensor_[i], 9.8f), -9.8f);
             gyro_sensor_sum_[i] += gyro_sensor_[i];
         }
         sensor_record_cnt_++;
-    } else if (sensor_record_cnt_ == 200) {
+    } else if (sensor_record_cnt_ == 500) {
         HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
         for (uint8_t i = 0; i < 3; i++) {
             accel_bias_[i] = accel_sensor_sum_[i] / sensor_record_cnt_;
@@ -103,10 +103,18 @@ void IMU::sensorRecord() {
     }
 }
 
+void IMU::quat_update() {
+    const Quat omega = Quat(0, gyro_sensor_[0], gyro_sensor_[1], gyro_sensor_[2]);
+    quat_ = quat_ + quat_ * omega * 0.5f * (1.0f / 1000);
+    quat_.normalize();
+    quat_.toEulerDeg(roll_, pitch_, yaw_);
+}
+
 void IMU::update() {
     temperature_handle();
     acc_calculate();
     gyro_calculate();
     sensorDataTransform();
     sensorRecord();
+    quat_update();
 }

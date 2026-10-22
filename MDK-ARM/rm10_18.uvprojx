@@ -672,6 +672,16 @@
                 <FileArmAds/>
               </FileOption>
             </File>
+            <File>
+              <FileName>quat.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\UserCode\quat.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>quat.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\UserCode\quat.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

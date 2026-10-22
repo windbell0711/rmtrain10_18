@@ -6,6 +6,7 @@
 #include "tim.h"
 #include "accel_gyro.h"
 #include "pid.hpp"
+#include "quat.h"
 
 class IMU {
 public:
@@ -15,7 +16,11 @@ public:
     void gyro_calculate();
     void sensorDataTransform();
     void sensorRecord();
+    void quat_update();
     void update();
+
+    Quat quat_ = Quat();
+    float roll_=0, pitch_=0, yaw_=0;
 
 private:
     PID tpid = PID(15.0f, 0.0f, 1.0f, 0.0f, 99.0f, 0.02f);
@@ -39,10 +44,13 @@ private:
     float gyro_sensor_[3]  = { 0.0f, 0.0f, 0.0f };
     float accel_sensor_[3] = { 0.0f, 0.0f, 0.0f };
 
-    float gyro_bias_[3]    = { 0.0f, 0.0f, 0.0f };
-    float accel_bias_[3]   = { 0.0f, 0.0f, 0.0f };
+    float filter_k_ = 0.2;
+
+    float gyro_bias_[3]  = { 0.0f, 0.0f, 0.0f };
+    float accel_bias_[3] = { 0.0f, 0.0f, 0.0f };
 
     float accel_sen_ = 0.0098f;
+    float gyro_sen_  = 0.01745329252f;  // pi/180
 };
 
 
