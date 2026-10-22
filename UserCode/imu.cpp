@@ -1,6 +1,20 @@
 
 #include "imu.h"
 
+void IMU::temperature_handle() {
+    uint8_t raw_temp_msb, raw_temp_lsb;
+    bmi088_accel_read_reg(0x22, &raw_temp_msb, 1);
+    bmi088_accel_read_reg(0x23, &raw_temp_lsb, 1);
+    temperature = static_cast<int16_t>((raw_temp_msb << 3) | ((raw_temp_lsb & 0b11100000) >> 5)) * 0.125f + 23;
+
+    if (temperature_target > temperature) {
+        // 需要加热
+        htim2.Instance->CCR1 = static_cast<uint32_t>(
+            max(0.0f, tpid.calc(temperature_target, temperature))
+        );
+    }
+}
+
 void IMU::acc_calculate() {
     // 1. 设置/读取acc0x41寄存器中的量程range参数，并换算为量程系数
     uint8_t raw_range;
@@ -72,6 +86,7 @@ void IMU::sensorDataTransform() {
 }
 
 void IMU::update() {
+    temperature_handle();
     acc_calculate();
     gyro_calculate();
     sensorDataTransform();
