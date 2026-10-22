@@ -77,15 +77,21 @@ void IMU::sensorDataTransform() {
             raw_data_.gyro[1] * R_imu_[i][1] +
             raw_data_.gyro[2] * R_imu_[i][2]
         ) - gyro_bias_[i])*(filter_k_);
+        gyro_sensor_[i] = replace_if_near(replace_if_near(replace_if_near(gyro_sensor_[i], -9.8f), 0.0f), 9.8f);
         accel_sensor_[i] = accel_sensor_[i]*(1-filter_k_) + (accel_sen_ * (
             raw_data_.accel[0] * R_imu_[i][0] +
             raw_data_.accel[1] * R_imu_[i][1] +
             raw_data_.accel[2] * R_imu_[i][2]
         ) - accel_bias_[i])*(filter_k_);
+        accel_sensor_[i] = replace_if_near(replace_if_near(replace_if_near(accel_sensor_[i], -9.8f), 0.0f), 9.8f);
     }
 }
 
 void IMU::sensorRecord() {
+    if (sensor_record_start_cd_ > 0) {
+        sensor_record_start_cd_--;
+        return;
+    }
     if (sensor_record_cnt_ < 500) {
         HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
         for (uint8_t i = 0; i < 3; i++) {

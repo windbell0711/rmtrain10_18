@@ -21,6 +21,10 @@ inline float goto_nearest(float v, float a, float b) {
     return (abs(v-a) < abs(v-b)) ? a : b;
 }
 
+inline float replace_if_near(float v, float guess, float tol = 0.005f) {
+    return (abs(v-guess) < tol) ? guess : v;
+}
+
 inline float minus_if_near(float v, float m, float tol = 1.0f) {
     return (abs(v-m) < tol) ? v-m : v;
 }

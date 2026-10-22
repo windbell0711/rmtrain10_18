@@ -40,11 +40,12 @@ private:
     float gyro_sensor_sum_[3]  = { 0.0f, 0.0f, 0.0f };
     float accel_sensor_sum_[3] = { 0.0f, 0.0f, 0.0f };
     int16_t sensor_record_cnt_ = 0;
+    int16_t sensor_record_start_cd_ = 2500;
 
     float gyro_sensor_[3]  = { 0.0f, 0.0f, 0.0f };
     float accel_sensor_[3] = { 0.0f, 0.0f, 0.0f };
 
-    float filter_k_ = 0.2;
+    float filter_k_ = 0.015f;
 
     float gyro_bias_[3]  = { 0.0f, 0.0f, 0.0f };
     float accel_bias_[3] = { 0.0f, 0.0f, 0.0f };

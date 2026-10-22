@@ -21,6 +21,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim) {
     imu.update();
 }
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
+    if (GPIO_Pin == KEY_Pin) {
+        
+    }
+}
+
 #ifdef __cplusplus
 }
 #endif
