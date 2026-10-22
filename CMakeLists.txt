@@ -38,6 +38,11 @@ add_executable(${CMAKE_PROJECT_NAME}
         UserCode/accel_gyro.c
         UserCode/cs.h
         UserCode/bmi.h
+        UserCode/imu.cpp
+        UserCode/imu.h
+        UserCode/callback.cpp
+        UserCode/callback.h
+        UserCode/pid.cpp
 )
 
 # Add STM32CubeMX generated sources

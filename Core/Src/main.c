@@ -25,7 +25,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "accel_gyro.h"
+#include "callback.h"
 
 /* USER CODE END Includes */
 
@@ -47,11 +47,6 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
-// float imu_mx=0.0f, imu_my=0.0f, imu_mz=0.0f;
-uint8_t acc_x_l=0, acc_x_h=0;
-uint8_t RATE_X_LSB=0, RATE_X_MSB=0;
-uint8_t ACC_CHIP_ID=0;
 
 /* USER CODE END PV */
 
@@ -99,9 +94,7 @@ int main(void)
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
 
-  if (bmi088_init() == 0) {
-    Error_Handler();
-  }
+  MainInit();
 
   if (HAL_TIM_Base_Start_IT(&htim6) != HAL_OK) {
     Error_Handler();
@@ -166,17 +159,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef* htim)
-{
-  if (htim->Instance != TIM6)
-    return;
-  bmi088_accel_read_reg(0x12, &acc_x_l, 1);
-  bmi088_accel_read_reg(0x13, &acc_x_h, 1);
-  bmi088_accel_read_reg(0x00, &ACC_CHIP_ID, 1);
-  bmi088_gyro_read_reg(0x02, &RATE_X_LSB, 1);
-  bmi088_gyro_read_reg(0x03, &RATE_X_MSB, 1);
-}
 
 /* USER CODE END 4 */
 
