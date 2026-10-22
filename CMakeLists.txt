@@ -40,6 +40,7 @@ add_executable(${CMAKE_PROJECT_NAME}
         UserCode/callback.cpp
         UserCode/pid.cpp
         UserCode/quat.cpp
+        UserCode/vector.cpp
 )
 
 # Add STM32CubeMX generated sources

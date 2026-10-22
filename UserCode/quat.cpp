@@ -9,8 +9,6 @@ Quat::Quat() : w(1.0f), x(0.0f), y(0.0f), z(0.0f) {}
 Quat::Quat(float w_, float x_, float y_, float z_)
     : w(w_), x(x_), y(y_), z(z_) {}
 
-Quat Quat::identity() { return Quat(1.0f, 0.0f, 0.0f, 0.0f); }
-
 Quat Quat::operator+(const Quat& b) const {
     return Quat(w + b.w, x + b.x, y + b.y, z + b.z);
 }
@@ -34,21 +32,12 @@ float Quat::norm() const {
 
 Quat Quat::normalized() const {
     float n = norm();
-    if (n < 1e-8f) return Quat::identity();
+    if (n < 1e-8f) return Quat(1.0f, 0.0f, 0.0f, 0.0f);
     float inv = 1.0f / n;
     return Quat(w*inv, x*inv, y*inv, z*inv);
 }
 
 void Quat::normalize() { *this = normalized(); }
-
-Quat Quat::conjugate() const { return Quat(w, -x, -y, -z); }
-
-Quat Quat::inverse() const {
-    float n2 = w*w + x*x + y*y + z*z;
-    if (n2 < 1e-8f) return Quat::identity();
-    float inv_n2 = 1.0f / n2;
-    return Quat(w*inv_n2, -x*inv_n2, -y*inv_n2, -z*inv_n2);
-}
 
 void Quat::toEuler(float& roll, float& pitch, float& yaw) const {
     roll = std::atan2(2.0f*(w*x + y*z), 1.0f - 2.0f*(x*x + y*y));
@@ -83,11 +72,4 @@ Quat Quat::fromEuler(float roll, float pitch, float yaw) {
     Quat qy(cp, 0, sp, 0);
     Quat qx(cr, sr, 0, 0);
     return qz * qy * qx;
-}
-
-void Quat::rotateVector(float vx, float vy, float vz,
-                        float& ox, float& oy, float& oz) const {
-    Quat p(0, vx, vy, vz);
-    Quat r = (*this) * p * conjugate();
-    ox = r.x; oy = r.y; oz = r.z;
 }

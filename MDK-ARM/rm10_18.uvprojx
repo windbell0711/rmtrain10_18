@@ -682,6 +682,16 @@
               <FileType>5</FileType>
               <FilePath>..\UserCode\quat.h</FilePath>
             </File>
+            <File>
+              <FileName>vector.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\UserCode\vector.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>vector.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\UserCode\vector.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

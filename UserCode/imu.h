@@ -7,6 +7,7 @@
 #include "accel_gyro.h"
 #include "pid.hpp"
 #include "quat.h"
+#include "vector.h"
 
 class IMU {
 public:
@@ -23,7 +24,8 @@ public:
     float roll_=0, pitch_=0, yaw_=0;
 
 private:
-    PID tpid = PID(15.0f, 0.0f, 1.0f, 0.0f, 99.0f, 0.02f);
+    PID tpid = PID(15.0f,   0.0f, 1.0f, 0.0f, 0.0f, 0.02f);
+    PID qpid = PID(0.2f, 0.0002f, 0.0f, 1.0f, 0.0f, 0.0f);
 
     const float R_imu_[3][3] = {{-1.0f, 0.0f, 0.0f},
                              {0.0f, 1.0f, 0.0f},

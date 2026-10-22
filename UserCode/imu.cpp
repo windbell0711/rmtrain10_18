@@ -110,6 +110,18 @@ void IMU::sensorRecord() {
 }
 
 void IMU::quat_update() {
+    // Vect accel_grav = Vect(accel_sensor_[0],
+    //                        accel_sensor_[1],
+    //                        accel_sensor_[2]).normalized();
+    // Vect gyro_grav  = Vect(2 * (quat_.x*quat_.z - quat_.w*quat_.y),
+    //                        2 * (quat_.w*quat_.x + quat_.y*quat_.z),
+    //                        quat_.w*quat_.w - quat_.x*quat_.x - quat_.y*quat_.y + quat_.z*quat_.z);
+    // Vect err = accel_grav * gyro_grav;
+    //
+    // gyro_sensor_[0] += qpid.calc(err.x, 0);
+    // gyro_sensor_[1] += qpid.calc(err.y, 0);
+    // gyro_sensor_[2] += qpid.calc(err.z, 0);
+
     const Quat omega = Quat(0, gyro_sensor_[0], gyro_sensor_[1], gyro_sensor_[2]);
     quat_ = quat_ + quat_ * omega * 0.5f * (1.0f / 1000);
     quat_.normalize();
@@ -117,7 +129,7 @@ void IMU::quat_update() {
 }
 
 void IMU::update() {
-    temperature_handle();
+    // temperature_handle();
     acc_calculate();
     gyro_calculate();
     sensorDataTransform();
