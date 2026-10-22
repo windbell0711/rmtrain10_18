@@ -37,9 +37,9 @@ void IMU::acc_calculate() {
 
     // 3. 用量程系数将原始数据转换为常用单位
     // LSB -> acc (m/s2)
-    raw_data_.accel[0] = raw_acc_x / 32768.0f * acc_range / 100.0f;
-    raw_data_.accel[1] = raw_acc_y / 32768.0f * acc_range / 100.0f;
-    raw_data_.accel[2] = raw_acc_z / 32768.0f * acc_range / 100.0f;
+    raw_data_.accel[0] = raw_acc_x / 32768.0f * acc_range;
+    raw_data_.accel[1] = raw_acc_y / 32768.0f * acc_range;
+    raw_data_.accel[2] = raw_acc_z / 32768.0f * acc_range;
 }
 
 void IMU::gyro_calculate(){
@@ -85,9 +85,28 @@ void IMU::sensorDataTransform() {
     }
 }
 
+void IMU::sensorRecord() {
+    if (sensor_record_cnt_ < 200) {
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+        for (uint8_t i = 0; i < 3; i++) {
+            accel_sensor_sum_[i] += minus_if_near(minus_if_near(accel_sensor_[i], 9.8f), -9.8f);
+            gyro_sensor_sum_[i] += gyro_sensor_[i];
+        }
+        sensor_record_cnt_++;
+    } else if (sensor_record_cnt_ == 200) {
+        HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+        for (uint8_t i = 0; i < 3; i++) {
+            accel_bias_[i] = accel_sensor_sum_[i] / sensor_record_cnt_;
+            gyro_bias_[i]  = gyro_sensor_sum_[i] / sensor_record_cnt_;
+        }
+        sensor_record_cnt_++;
+    }
+}
+
 void IMU::update() {
     temperature_handle();
     acc_calculate();
     gyro_calculate();
     sensorDataTransform();
+    sensorRecord();
 }

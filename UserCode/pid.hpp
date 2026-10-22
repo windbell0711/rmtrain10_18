@@ -1,6 +1,10 @@
 #ifndef RM2610_11_PID_H
 #define RM2610_11_PID_H
 
+inline float abs(float v) {
+    return (v > 0) ? v : -v;
+}
+
 inline float max(const float a, const float b) {
     return a > b ? a : b;
 }
@@ -11,6 +15,14 @@ inline float min(const float a, const float b) {
 
 inline float limit_between(float v, float l, float h) {
     return max(min(v, h), l);
+}
+
+inline float goto_nearest(float v, float a, float b) {
+    return (abs(v-a) < abs(v-b)) ? a : b;
+}
+
+inline float minus_if_near(float v, float m, float tol = 1.0f) {
+    return (abs(v-m) < tol) ? v-m : v;
 }
 
 

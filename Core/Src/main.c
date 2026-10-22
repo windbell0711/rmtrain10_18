@@ -91,11 +91,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI1_Init();
-  MX_TIM2_Init();
   MX_TIM6_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 
   MainInit();
+  HAL_Delay(1000);
 
   if (HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1) != HAL_OK) {
     Error_Handler();

@@ -14,6 +14,7 @@ public:
     void acc_calculate();
     void gyro_calculate();
     void sensorDataTransform();
+    void sensorRecord();
     void update();
 
 private:
@@ -31,13 +32,17 @@ private:
     float temperature = 30;
     float temperature_target = 35;
 
+    float gyro_sensor_sum_[3]  = { 0.0f, 0.0f, 0.0f };
+    float accel_sensor_sum_[3] = { 0.0f, 0.0f, 0.0f };
+    int16_t sensor_record_cnt_ = 0;
+
     float gyro_sensor_[3]  = { 0.0f, 0.0f, 0.0f };
     float accel_sensor_[3] = { 0.0f, 0.0f, 0.0f };
 
-    float gyro_bias_[3]    = { -0.08f,  0.23f,  0.05f };
-    float accel_bias_[3]   = {  0.20f, -0.12f, -0.18f };
+    float gyro_bias_[3]    = { 0.0f, 0.0f, 0.0f };
+    float accel_bias_[3]   = { 0.0f, 0.0f, 0.0f };
 
-    float accel_sen_ = 1.0f;
+    float accel_sen_ = 0.0098f;
 };
 
 
