@@ -19,9 +19,6 @@ public:
 
     bool toEuler(float& roll, float& pitch, float& yaw) const;
     bool toEulerDeg(float& roll, float& pitch, float& yaw) const;
-
-    static Quat fromAxisAngle(float ux, float uy, float uz, float angle);
-    static Quat fromEuler(float roll, float pitch, float yaw);
 };
 
 #endif //RM10_18_QUAT_H

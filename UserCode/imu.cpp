@@ -7,12 +7,13 @@ void IMU::temperature_handle() {
     bmi088_accel_read_reg(0x23, &raw_temp_lsb, 1);
     temperature = static_cast<int16_t>((raw_temp_msb << 3) | ((raw_temp_lsb & 0b11100000) >> 5)) * 0.125f + 23;
 
-    if (temperature_target > temperature) {
-        // 需要加热
-        htim2.Instance->CCR1 = static_cast<uint32_t>(
-            max(0.0f, tpid.calc(temperature_target, temperature))
-        );
-    }
+    // 注：似乎无效，先关闭
+    // if (temperature_target > temperature) {
+    //     // 需要加热
+    //     htim2.Instance->CCR1 = static_cast<uint32_t>(
+    //         max(0.0f, tpid.calc(temperature_target, temperature))
+    //     );
+    // }
 }
 
 void IMU::acc_calculate() {
@@ -71,6 +72,10 @@ void IMU::gyro_calculate(){
 }
 
 void IMU::sensorDataTransform() {
+    // 1. 从传感器旋转到机体坐标系
+    // 2. 单位换算 (accel mg -> m/s2 ; gyro deg/s -> rad/s)
+    // 3. 零漂修正
+    // 4. 一阶低通滤波
     for (uint8_t i = 0; i < 3; i++) {
         gyro_sensor_[i] = gyro_sensor_[i]*(1-filter_k_) + (gyro_sen_ * (
             raw_data_.gyro[0] * R_imu_[i][0] +
@@ -86,13 +91,16 @@ void IMU::sensorDataTransform() {
 }
 
 void IMU::sensorRecord() {
+    // 先等待 sensor_record_start_cd_ 次 loop （开头的数据有点问题）
     if (sensor_record_start_cd_ > 0) {
         sensor_record_start_cd_--;
         return;
     }
     if (sensor_record_cnt_ < 0) {
+        // sensor_record_cnt_为负则视作关闭record功能
         HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
     } else if (sensor_record_cnt_ < sensor_record_cnt_max_) {
+        // 采样点个数未达到sensor_record_cnt_max_，继续采样
         HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
         for (uint8_t i = 0; i < 3; i++) {
             accel_sensor_sum_[i] += minus_if_near(minus_if_near(accel_sensor_[i], 9.8f), -9.8f);
@@ -100,6 +108,7 @@ void IMU::sensorRecord() {
         }
         sensor_record_cnt_++;
     } else if (sensor_record_cnt_ == sensor_record_cnt_max_) {
+        // 采样点个数已达到sensor_record_cnt_max_，整理数据写入零漂校正参数，sensor_record_cnt_max_加一切掉状态
         HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
         for (uint8_t i = 0; i < 3; i++) {
             accel_bias_[i] = accel_sensor_sum_[i] / sensor_record_cnt_;
@@ -110,9 +119,11 @@ void IMU::sensorRecord() {
 }
 
 void IMU::quat_update() {
+    // 在没有测出来零漂校正参数前，不更新quat
     if (sensor_record_cnt_ < sensor_record_cnt_max_) {
         return;
     }
+
     // 加速度计测的重力
     Vect accel_grav = Vect(-accel_sensor_[0],
                            -accel_sensor_[1],
@@ -121,6 +132,7 @@ void IMU::quat_update() {
     Vect gyro_grav  = Vect(2 * (quat_.x*quat_.z - quat_.w*quat_.y),
                            2 * (quat_.w*quat_.x + quat_.y*quat_.z),
                            quat_.w*quat_.w - quat_.x*quat_.x - quat_.y*quat_.y + quat_.z*quat_.z);
+
     // 误差
     Vect err = Vect(0.0f, 0.0f, 0.0f);
     // 若测的重力超出 9.8+-0.5，就认为不准确了，放弃 qpid
@@ -128,6 +140,7 @@ void IMU::quat_update() {
         err = accel_grav.normalized() * gyro_grav;
     }
 
+    // 用陀螺仪数据加上pid更新四元数
     const Quat omega = Quat(0,
         gyro_sensor_[0] + qpid_x.calc(err.x, 0),
         gyro_sensor_[1] + qpid_y.calc(err.y, 0),
@@ -138,10 +151,10 @@ void IMU::quat_update() {
 }
 
 void IMU::update() {
-    // temperature_handle();
-    acc_calculate();
-    gyro_calculate();
-    sensorDataTransform();
-    sensorRecord();
-    quat_update();
+    temperature_handle(); // 温漂修正
+    acc_calculate(); // 获取加速度计
+    gyro_calculate(); // 获取陀螺仪
+    sensorDataTransform(); // 传感器数据处理
+    sensorRecord(); // 零漂采样
+    quat_update(); // 更新姿态
 }

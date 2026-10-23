@@ -67,19 +67,3 @@ bool Quat::toEulerDeg(float& roll, float& pitch, float& yaw) const {
     yaw   = ay * R2D;
     return true;
 }
-
-Quat Quat::fromAxisAngle(float ux, float uy, float uz, float angle) {
-    float half = 0.5f * angle;
-    float s = std::sin(half);
-    return Quat(std::cos(half), ux*s, uy*s, uz*s);
-}
-
-Quat Quat::fromEuler(float roll, float pitch, float yaw) {
-    float cr = std::cos(0.5f*roll),  sr = std::sin(0.5f*roll);
-    float cp = std::cos(0.5f*pitch), sp = std::sin(0.5f*pitch);
-    float cy = std::cos(0.5f*yaw),   sy = std::sin(0.5f*yaw);
-    Quat qz(cy, 0, 0, sy);
-    Quat qy(cp, 0, sp, 0);
-    Quat qx(cr, sr, 0, 0);
-    return qz * qy * qx;
-}
