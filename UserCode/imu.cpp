@@ -113,14 +113,20 @@ void IMU::quat_update() {
     if (sensor_record_cnt_ < sensor_record_cnt_max_) {
         return;
     }
-
+    // 加速度计测的重力
     Vect accel_grav = Vect(-accel_sensor_[0],
                            -accel_sensor_[1],
-                           -accel_sensor_[2]).normalized();
+                           -accel_sensor_[2]);
+    // 陀螺仪测的重力
     Vect gyro_grav  = Vect(2 * (quat_.x*quat_.z - quat_.w*quat_.y),
                            2 * (quat_.w*quat_.x + quat_.y*quat_.z),
                            quat_.w*quat_.w - quat_.x*quat_.x - quat_.y*quat_.y + quat_.z*quat_.z);
-    Vect err = accel_grav * gyro_grav;
+    // 误差
+    Vect err = Vect(0.0f, 0.0f, 0.0f);
+    // 若测的重力超出 9.8+-0.5，就认为不准确了，放弃 qpid
+    if (abs(accel_grav.norm() - 9.8f) < 0.5f) {
+        err = accel_grav.normalized() * gyro_grav;
+    }
 
     const Quat omega = Quat(0,
         gyro_sensor_[0] + qpid_x.calc(err.x, 0),

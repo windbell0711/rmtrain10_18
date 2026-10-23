@@ -17,8 +17,8 @@ public:
     Quat  normalized() const;
     void  normalize();
 
-    void toEuler(float& roll, float& pitch, float& yaw) const;
-    void toEulerDeg(float& roll, float& pitch, float& yaw) const;
+    bool toEuler(float& roll, float& pitch, float& yaw) const;
+    bool toEulerDeg(float& roll, float& pitch, float& yaw) const;
 
     static Quat fromAxisAngle(float ux, float uy, float uz, float angle);
     static Quat fromEuler(float roll, float pitch, float yaw);

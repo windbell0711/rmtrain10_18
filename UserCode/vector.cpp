@@ -20,7 +20,7 @@ float Vect::norm() const {
 
 Vect Vect::normalized() const {
     float n = norm();
-    if (n < 1e-8f) return Vect(0.0f, 0.0f, 0.0f);
+    if (n < 1e-12f) return Vect(0.0f, 0.0f, 0.0f);
     float inv = 1.0f / n;
     return Vect(x*inv, y*inv, z*inv);
 }
