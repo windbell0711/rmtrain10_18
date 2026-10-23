@@ -24,8 +24,10 @@ public:
     float roll_=0, pitch_=0, yaw_=0;
 
 private:
-    PID tpid = PID(15.0f,   0.0f, 1.0f, 0.0f, 0.0f, 0.02f);
-    PID qpid = PID(0.2f, 0.0002f, 0.0f, 1.0f, 0.0f, 0.0f);
+    PID tpid = PID(15.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.02f);
+    PID qpid_x = PID(0.1f, 0.0f, 0.0f, 0.0f, 0.1f, 0.0f);
+    PID qpid_y = PID(0.1f, 0.0f, 0.0f, 0.0f, 0.1f, 0.0f);
+    PID qpid_z = PID(0.1f, 0.0f, 0.0f, 0.0f, 0.1f, 0.0f);
 
     const float R_imu_[3][3] = {{-1.0f, 0.0f, 0.0f},
                              {0.0f, 1.0f, 0.0f},
@@ -42,12 +44,13 @@ private:
     float gyro_sensor_sum_[3]  = { 0.0f, 0.0f, 0.0f };
     float accel_sensor_sum_[3] = { 0.0f, 0.0f, 0.0f };
     int16_t sensor_record_cnt_ = 0;
-    int16_t sensor_record_start_cd_ = 2500;
+    constexpr static int16_t sensor_record_cnt_max_ = 2000;
+    int16_t sensor_record_start_cd_ = 3000;
 
     float gyro_sensor_[3]  = { 0.0f, 0.0f, 0.0f };
     float accel_sensor_[3] = { 0.0f, 0.0f, 0.0f };
 
-    float filter_k_ = 0.015f;
+    float filter_k_ = 0.05f;
 
     float gyro_bias_[3]  = { 0.0f, 0.0f, 0.0f };
     float accel_bias_[3] = { 0.0f, 0.0f, 0.0f };

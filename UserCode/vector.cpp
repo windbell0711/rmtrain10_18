@@ -9,9 +9,9 @@ Vect Vect::operator+(const Vect &v) const {
 }
 
 Vect Vect::operator*(const Vect &v) const {
-    return Vect(y * v.z + z * v.y,
-                z * v.x + x * v.z,
-                x * v.y + y * v.x);
+    return Vect(y * v.z - z * v.y,
+                z * v.x - x * v.z,
+                x * v.y - y * v.x);
 }
 
 float Vect::norm() const {
